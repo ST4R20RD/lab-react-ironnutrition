@@ -1,25 +1,66 @@
-import logo from './logo.svg';
+import { Divider, Row } from 'antd';
+import { useState } from 'react';
 import './App.css';
+import foods from './foods.json';
+import FoodBox from './components/FoodBox';
+import AddFoodForm from './components/AddFoodForm'
+import SearchBar from './components/SearchBar';
 
 function App() {
+  const [foodList, setFoodList] = useState(foods);
+  const [foodsData, setFoodsData] = useState(foods)
+  const addFood = (newFood) => {
+
+    const updatedFoods = [newFood, ...foods]
+
+    setFoodList(updatedFoods)
+
+  }
+  const filterFoodList = (string) => {
+
+    let filteredFoods;
+
+    if (string === '') {
+      filteredFoods = foodsData;
+    } else {
+      filteredFoods = foodsData.filter(foodData => {
+        return foodData.name.toLowerCase().includes(string.toLowerCase());
+      })
+    }
+
+    setFoodList(filteredFoods);
+  }
+  function deleteFromFoodList(param) {
+    let copyFoodValues = [...foodList];
+
+    const filteredItems = copyFoodValues.filter(function (item) {
+      return item.name !== param.name;
+    });
+
+    setFoodList(filteredItems);
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Divider>Food List</Divider>
+      <AddFoodForm addFood={ addFood }/>
+      <SearchBar filterFoodList={filterFoodList}/>
+      <Row>
+      {foodList.map((food, index) => {
+        return (
+          <FoodBox
+                key={index}
+                food={ {
+                  name: food.name,
+                  calories: food.calories,
+                  image: food.image,
+                  servings: food.servings
+                }}
+                deletedItem={deleteFromFoodList}
+              />
+        );
+      })}
+      </Row>
     </div>
   );
 }
-
 export default App;
